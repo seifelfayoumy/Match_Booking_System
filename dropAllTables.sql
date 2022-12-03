@@ -1,0 +1,11 @@
+CREATE PROCEDURE dropAllTables
+AS
+DROP TABLE Stadium
+DROP TABLE Match
+DROP TABLE StadiumManager
+DROP TABLE SystemAdmin
+DROP TABLE AssociationManager
+DROP TABLE ClubrRpresentitive
+DROP TABLE ClubStadiumRequest
+DROP TABLE Ticket
+DROP TABLE Fan
