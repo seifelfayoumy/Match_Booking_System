@@ -1,19 +1,93 @@
 CREATE PROCEDURE createAllTables
 AS
+
+CREATE TABLE SystemUser
+(
+  username VARCHAR(20),
+  suPassword VARCHAR(20),
+  PRIMARY KEY (username)
+)
+
+CREATE TABLE Club
+(
+  cId INT IDENTITY,
+  cName VARCHAR(20),
+  cLocation VARCHAR(20),
+  PRIMARY KEY (cId)
+)
+
 CREATE TABLE Stadium
 (
-  id INT IDENTITY,
-  name VARCHAR(20),
-  capacity INT,
-  location VARCHAR(20),
-  status VARCHAR(20),
+  stId INT IDENTITY,
+  stName VARCHAR(20),
+  stCapacity INT,
+  stLocation VARCHAR(20),
+  stStatus VARCHAR(20),
   createdBy INT,
-  PRIMARY KEY (id),
+  PRIMARY KEY (stId),
   FOREIGN KEY (createdBy) REFERENCES SystemAdmin
 )
+
+CREATE TABLE StadiumManager
+(
+  smId INT IDENTITY,
+  smName VARCHAR(20),
+  username VARCHAR(20),
+  stadiumId INT,
+  PRIMARY KEY (smId),
+  FOREIGN KEY (stadiumId) REFERENCES Stadium,
+  FOREIGN KEY (username) REFERENCES SystemUser (username)
+)
+
+CREATE TABLE ClubRepresentative
+(
+
+  crId INT IDENTITY primary KEY,
+  crName VARCHAR(20),
+  username VARCHAR(20),
+  clubId INT,
+  FOREIGN KEY (clubId) REFERENCES Club,
+  FOREIGN KEY (username) REFERENCES SystemUser (username)
+)
+
+CREATE TABLE AssociationManager
+(
+  amId INT IDENTITY,
+  amName VARCHAR(20),
+  username VARCHAR(20),
+  PRIMARY KEY (amId),
+  FOREIGN KEY (username) REFERENCES SystemUser (username)
+)
+
+CREATE TABLE SystemAdmin
+(
+  saId INT IDENTITY,
+  saName VARCHAR(20),
+  username VARCHAR(20),
+  PRIMARY KEY (saId),
+  FOREIGN KEY (username) REFERENCES SystemUser (username)
+)
+
+CREATE TABLE Fan
+(
+  nationalId VARCHAR(20),
+  fName VARCHAR(20),
+  username VARCHAR(20),
+  phoneNumber INT,
+  fAddress VARCHAR(20),
+  birthDate date,
+  createdBy INT,
+  blockedBy INT,
+  fStatus BIT,
+  PRIMARY KEY (nationalId),
+  FOREIGN KEY (createdBy) REFERENCES SystemAdmin,
+  FOREIGN KEY (blockedBy) REFERENCES SystemAdmin,
+  FOREIGN KEY (username) REFERENCES SystemUser (username)
+)
+
 CREATE TABLE Match
 (
-  id INT IDENTITY,
+  mId INT IDENTITY,
   startTime DATE,
   endTime Date,
   allowedAttendees INT,
@@ -22,7 +96,7 @@ CREATE TABLE Match
   secondClubId INT,
   createdBy INT,
   editedBy INT,
-  PRIMARY KEY (id),
+  PRIMARY KEY (mId),
   FOREIGN KEY (stadiumId) REFERENCES Stadium,
   FOREIGN KEY (hostClubId) REFERENCES Club,
   FOREIGN KEY (secondClubId) REFERENCES Club,
@@ -30,69 +104,37 @@ CREATE TABLE Match
   FOREIGN KEY (editebBy) REFERENCES AssociationManager,
 
 )
-CREATE TABLE StadiumManager
-(
-  id INT IDENTITY,
-  name VARCHAR(20),
-  username VARCHAR(20),
-  password VARCHAR(20),
-  stadiumId INT,
-  PRIMARY KEY (id),
-  FOREIGN KEY (stadiumId) REFERENCES Stadium
-)
-CREATE TABLE SystemAdmin
-(
-  id INT IDENTITY,
-  name VARCHAR(20),
-  username VARCHAR(20),
-  password VARCHAR(20),
-  PRIMARY KEY (id)
-)
-CREATE TABLE AssociationManager
-(
-  id INT IDENTITY,
-  name VARCHAR(20),
-  username VARCHAR(20),
-  password VARCHAR(20),
-  PRIMARY KEY (id)
-)
-CREATE TABLE ClubrRpresentitive
-(
-
-  id int IDENTITY primary key,
-  CRname varchar(20),
-  username varchar(20),
-  CRpassword varchar(20),
-  clubid int FOREIGN key REFERENCES Club
-)
 
 create table ClubStadiumRequest
 (
 
-  id int IDENTITY PRIMARY KEY,
-  ClubRepresentitiveId int FOREIGN key REFERENCES ClubrRpresentitive,
-  ManagerStadiumId int FOREIGN key REFERENCES StadiumManger,
-  CRStatus varchar(20)
+  csrId INT IDENTITY,
+  clubRepresentativeId INT,
+  smId INT,
+  csrStatus VARCHAR(20),
+  PRIMARY KEY (csrId),
+  FOREIGN KEY (clubRepresentativeId) REFERENCES ClubRepresentative,
+  FOREIGN KEY (smId) REFERENCES StadiumManger
+
 )
+
 CREATE TABLE Ticket
 (
-  id INT IDENTITY PRIMARY KEY,
-  sadiumId INT FOREIGN KEY REFERENCES Stadium,
-  fanId INT FOREIGN KEY REFERENCES  Fan,
-  Tstatus VARCHAR(20),
+  tId INT IDENTITY,
+  matchId INT,
+  tStatus VARCHAR(20),
+  PRIMARY KEY (tId),
+  FOREIGN KEY (matchId) REFERENCES Match,
+  FOREIGN KEY (fanId) REFERENCES Fan
 )
-CREATE TABLE Fan
-(
 
-  id int IDENTITY PRIMARY key,
-  Fname VARCHAR(20),
-  username VARCHAR(20),
-  Fpassword varchar(20),
-  nationalId int,
-  phoneNumber int,
-  Faddress varchar(20),
-  birthDate date,
-  createdBy int FOREIGN KEY REFERENCES SystemAdmin,
-  blockedBy int fOREIGN KEY REFERENCES SystemAdmin,
-  isBlocked int
+CREATE TABLE TicketFan
+(
+  tfId INT IDENTITY,
+  fId INT,
+  tId INT,
+  PRIMARY KEY (tfId),
+  FOREIGN KEY (fId) REFERENCES Fan,
+  FOREIGN KEY (tId) REFERENCES Ticket
 )
+
