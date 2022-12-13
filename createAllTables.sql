@@ -88,18 +88,18 @@ CREATE TABLE Fan
 CREATE TABLE Match
 (
   mId INT IDENTITY,
-  startTime DATE,
-  endTime Date,
+  startTime DATETIME,
+  endTime DATETIME,
+  hostClubId INT,
+  guestClubId INT,
   allowedAttendees INT,
   stadiumId INT,
-  hostClubId INT,
-  secondClubId INT,
   createdBy INT,
   editedBy INT,
   PRIMARY KEY (mId),
   FOREIGN KEY (stadiumId) REFERENCES Stadium,
   FOREIGN KEY (hostClubId) REFERENCES Club,
-  FOREIGN KEY (secondClubId) REFERENCES Club,
+  FOREIGN KEY (guestClubId) REFERENCES Club,
   FOREIGN KEY (createdBy) REFERENCES AssociationManager,
   FOREIGN KEY (editebBy) REFERENCES AssociationManager,
 
@@ -110,11 +110,11 @@ create table ClubStadiumRequest
 
   csrId INT IDENTITY,
   clubRepresentativeId INT,
-  smId INT,
+  stadiumManagerId INT,
   csrStatus VARCHAR(20),
   PRIMARY KEY (csrId),
   FOREIGN KEY (clubRepresentativeId) REFERENCES ClubRepresentative,
-  FOREIGN KEY (smId) REFERENCES StadiumManger
+  FOREIGN KEY (stadiumManagerId) REFERENCES StadiumManger
 
 )
 

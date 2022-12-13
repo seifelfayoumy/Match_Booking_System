@@ -9,3 +9,6 @@ DROP TABLE ClubrRpresentitive
 DROP TABLE ClubStadiumRequest
 DROP TABLE Ticket
 DROP TABLE Fan
+DROP TABLE Club
+DROP TABLE TicketFan
+DROP TABLE SystemUser

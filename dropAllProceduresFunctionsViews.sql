@@ -1,0 +1,2 @@
+CREATE PROCEDURE dropAllProceduresFunctionsViews
+AS

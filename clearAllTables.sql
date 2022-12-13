@@ -8,3 +8,7 @@ DELETE FROM AssociationManager
 DELETE FROM ClubrRpresentitive
 DELETE FROM ClubStadiumRequest
 DELETE FROM Ticket
+DELETE FROM Fan
+DELETE FROM Club
+DELETE FROM TicketFan
+DELETE FROM SystemUser
