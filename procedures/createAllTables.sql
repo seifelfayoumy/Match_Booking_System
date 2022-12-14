@@ -1,6 +1,7 @@
 CREATE PROCEDURE createAllTables
 AS
 
+BEGIN
 CREATE TABLE SystemUser
 (
   username VARCHAR(20),
@@ -22,10 +23,8 @@ CREATE TABLE Stadium
   stName VARCHAR(20),
   stCapacity INT,
   stLocation VARCHAR(20),
-  stStatus VARCHAR(20),
-  createdBy INT,
+  stStatus BIT,
   PRIMARY KEY (stId),
-  FOREIGN KEY (createdBy) REFERENCES SystemAdmin
 )
 
 CREATE TABLE StadiumManager
@@ -76,12 +75,8 @@ CREATE TABLE Fan
   phoneNumber INT,
   fAddress VARCHAR(20),
   birthDate date,
-  createdBy INT,
-  blockedBy INT,
   fStatus BIT,
   PRIMARY KEY (nationalId),
-  FOREIGN KEY (createdBy) REFERENCES SystemAdmin,
-  FOREIGN KEY (blockedBy) REFERENCES SystemAdmin,
   FOREIGN KEY (username) REFERENCES SystemUser (username)
 )
 
@@ -94,14 +89,10 @@ CREATE TABLE Match
   guestClubId INT,
   allowedAttendees INT,
   stadiumId INT,
-  createdBy INT,
-  editedBy INT,
   PRIMARY KEY (mId),
   FOREIGN KEY (stadiumId) REFERENCES Stadium,
   FOREIGN KEY (hostClubId) REFERENCES Club,
   FOREIGN KEY (guestClubId) REFERENCES Club,
-  FOREIGN KEY (createdBy) REFERENCES AssociationManager,
-  FOREIGN KEY (editebBy) REFERENCES AssociationManager,
 
 )
 
@@ -114,7 +105,7 @@ create table ClubStadiumRequest
   csrStatus VARCHAR(20),
   PRIMARY KEY (csrId),
   FOREIGN KEY (clubRepresentativeId) REFERENCES ClubRepresentative,
-  FOREIGN KEY (stadiumManagerId) REFERENCES StadiumManger
+  FOREIGN KEY (stadiumManagerId) REFERENCES StadiumManager
 
 )
 
@@ -122,19 +113,19 @@ CREATE TABLE Ticket
 (
   tId INT IDENTITY,
   matchId INT,
-  tStatus VARCHAR(20),
+  tStatus BIT,
   PRIMARY KEY (tId),
   FOREIGN KEY (matchId) REFERENCES Match,
-  FOREIGN KEY (fanId) REFERENCES Fan
 )
 
 CREATE TABLE TicketFan
 (
   tfId INT IDENTITY,
-  fId INT,
+  fId VARCHAR(20),
   tId INT,
   PRIMARY KEY (tfId),
   FOREIGN KEY (fId) REFERENCES Fan,
   FOREIGN KEY (tId) REFERENCES Ticket
 )
 
+END

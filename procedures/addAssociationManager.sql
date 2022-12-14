@@ -3,7 +3,11 @@ CREATE PROCEDURE addAssociationManager
   @username VARCHAR(20),
   @password VARCHAR(20)
 AS
+BEGIN
+
 INSERT INTO SystemUser
 VALUES(@username, @password)
 Insert into AssociationManger
 VALUES(@name, @username)
+
+END
