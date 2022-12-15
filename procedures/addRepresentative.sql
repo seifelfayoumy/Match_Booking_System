@@ -1,1 +1,21 @@
--- CREATE PROCEDURE addRepresentative
+CREATE PROCEDURE addRepresentative
+  @representativeName VARCHAR(20),
+  @clubName VARCHAR(20),
+  @representativeUsername VARCHAR(20),
+  @representativePassword VARCHAR(20)
+
+AS
+BEGIN
+
+  DECLARE @clubId INT
+  SET @clubId = (SELECT DISTINCT C.cId
+  FROM Club C
+  WHERE C.cName = @clubName)
+
+  INSERT INTO SystemUser
+  VALUES(@representativeUsername, @representativePassword)
+
+  INSERT INTO ClubRepresentative
+  VALUES(@representativeName, @representativeUsername, @clubId)
+
+END
