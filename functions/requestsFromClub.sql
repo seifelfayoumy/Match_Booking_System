@@ -5,9 +5,31 @@ RETURNS @result TABLE (hostName VARCHAR(20) ,guestName VARCHAR(20))
 AS
 BEGIN
 
-INSERT INTO @result
-SELECT ClubStadiumRequest CSR INNER JOIN 
+  DECLARE @representativeId INT
+  SET @representativeId
+  = (
+    SELECT DISTINCT CR.crId
+  FROM ClubRepresentative CR INNER JOIN Club C ON CR.clubId = CR.cId
+  WHERE C.cName = @clubName
+  )
 
+    DECLARE @stadiumManagerId INT
+  SET @stadiumManagerId
+  = (
+    SELECT DISTINCT SM.smId
+  FROM StadiumManager SM INNER JOIN Stadium S ON SM.stadiumId = SM.stId
+  WHERE S.stName = @stadiumName
+  )
+
+INSERT INTO @result
+SELECT C1.cName AS Host, C2.cName AS Guest
+FROM ClubStadiumRequest CSR 
+INNER JOIN Match M ON CSR.matchId = M.mId
+INNER JOIN Club C1 on M.hostClubId = C1.cName
+INNER JOIN Club C2 on M.guestClubId = C2.cName
+WHERE CSR.representativeId = @representativeId AND CSR.stadiumManagerId = @stadiumManagerId
+
+RETURN
 END
 
 -- CREATE FUNCTION requestsFromClub
