@@ -116,6 +116,7 @@ BEGIN
     tId INT IDENTITY,
     matchId INT,
     tStatus BIT,
+    availableCount INT,
     PRIMARY KEY (tId),
     FOREIGN KEY (matchId) REFERENCES Match,
   )

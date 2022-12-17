@@ -14,7 +14,15 @@ BEGIN
     INNER JOIN Club C2 on M.guestClubId = C2.cId
   WHERE C1.cName = @hostClubName AND C2.cName = @guestClubName AND M.startTime = @startTime
   )
+
+  DECLARE @availableCount INT
+  SET @availableCount = (
+      SELECT DISTINCT M.allowedAttendees
+  FROM Match M
+  WHERE M.mId = @matchId
+    )
+
   INSERT INTO Ticket
-  VALUES(@matchId, 1)
+  VALUES(@matchId, 1, @availableCount)
 
 END
