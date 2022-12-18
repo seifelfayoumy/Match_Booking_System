@@ -50,7 +50,7 @@ END
 -- SELECT @stId = stId FROM Stadium WHERE stName = @StadiumName
 
 -- DECLARE @smId INT
--- SELECT @smId = smId FROM StadiumManger WHERE @stId = stadiumId
+-- SELECT @smId = smId FROM StadiumManager WHERE @stId = stadiumId
 
 -- DECLARE @matchId AS INT
 -- SELECT @matchId = matchId FROM ClubStadiumRequest WHERE @crId = clubRepresantativeId AND @stId = stadiumManagerId

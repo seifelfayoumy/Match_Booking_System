@@ -7,7 +7,7 @@ BEGIN
 
 INSERT INTO SystemUser
 VALUES(@username, @password)
-Insert into AssociationManger
+Insert into AssociationManager
 VALUES(@name, @username)
 
 END
