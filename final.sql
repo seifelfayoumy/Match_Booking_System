@@ -221,21 +221,21 @@ BEGIN
 
   DECLARE @representativeId INT
   SET @representativeId = (
-  SELECT DISTINCT CR.crId
+  SELECT TOP 1 CR.crId
   FROM ClubRepresentative CR INNER JOIN Club C ON C.cId = CR.clubId
   WHERE C.cName = @clubName
   )
 
   DECLARE @stadiumManagerId INT
   SET @stadiumManagerId = (
-  SELECT DISTINCT SM.smId
-  FROM StadiuManager SM INNER JOIN Stadium S ON SM.stadiumId = S.stId
+  SELECT TOP 1 SM.smId
+  FROM StadiumManager SM INNER JOIN Stadium S ON SM.stadiumId = S.stId
   WHERE S.stName = @stadiumName
   )
 
   DECLARE @matchId INT
   SET @matchId = (
-  SELECT DISTINCT M.mId
+  SELECT TOP 1 M.mId
   FROM Match M INNER JOIN Stadium S ON M.stadiumId = S.stId
   WHERE S.stName = @stadiumName AND M.startTime = @startTime
   )
@@ -256,14 +256,14 @@ BEGIN
 
 BEGIN
   DECLARE @club1Id INT
-  SET @club1Id = (SELECT DISTINCT C.cId
+  SET @club1Id = (SELECT TOP 1 C.cId
   FROM Club C
   WHERE C.cName = @hostClub)
 END
 
 BEGIN
     DECLARE @club2Id INT
-  SET @club2Id = (SELECT DISTINCT C1.cId
+  SET @club2Id = (SELECT TOP 1 C1.cId
   FROM Club C1
   WHERE C1.cName = @guestClub)
 END
@@ -284,7 +284,7 @@ AS
 BEGIN
 
   DECLARE @clubId INT
-  SET @clubId = (SELECT DISTINCT C.cId
+  SET @clubId = (SELECT TOP 1 C.cId
   FROM Club C
   WHERE C.cName = @clubName)
 
@@ -322,7 +322,7 @@ BEGIN
 
 
   DECLARE @stadiumId INT
-  SET @stadiumId = (SELECT DISTINCT S.stId
+  SET @stadiumId = (SELECT TOP 1 S.stId
   FROM Stadium S
   WHERE S.stName = @stadiumName)
 
@@ -346,7 +346,7 @@ BEGIN
   DECLARE @matchId INT
   SET @matchId
   = (
-    SELECT DISTINCT M.mId
+    SELECT TOP 1 M.mId
   FROM Match M INNER JOIN Club C1 on M.hostClubId = C1.cId
     INNER JOIN Club C2 on M.guestClubId = C2.cId
   WHERE C1.cName = @hostClubName AND C2.cName = @guestClubName AND M.startTime = @startTime
@@ -354,7 +354,7 @@ BEGIN
 
   DECLARE @availableCount INT
   SET @availableCount = (
-      SELECT DISTINCT M.allowedAttendees
+      SELECT TOP 1 M.allowedAttendees
   FROM Match M
   WHERE M.mId = @matchId
     )
@@ -412,13 +412,15 @@ GO
 
 CREATE PROCEDURE deleteMatch
   @hostClubName VARCHAR(20),
-  @guestClubName VARCHAR(20)
+  @guestClubName VARCHAR(20),
+  @startTime DATETIME,
+  @endTime DATETIME
 AS
 BEGIN
 
   DELETE M FROM Match M INNER JOIN Club C1 on M.hostClubId = C1.cId
     INNER JOIN Club C2 on M.guestClubId = C2.cId
-WHERE C1.cName = @hostClubName AND C2.cName = @guestClubName
+WHERE C1.cName = @hostClubName AND C2.cName = @guestClubName AND M.startTime = @startTime AND M.endTime = @endTime
 
 END
 GO
@@ -539,7 +541,7 @@ BEGIN
   DECLARE @matchId INT
   SET @matchId
  =(
-SELECT DISTINCT m.mId
+SELECT TOP 1 m.mId
   FROM match m
     INNER JOIN Ticket T
     ON T.matchId = m.mId
@@ -552,7 +554,7 @@ SELECT DISTINCT m.mId
 
   DECLARE @ticketId int
   SET @ticketId = (
- SELECT DISTINCT T.tId
+ SELECT TOP 1 T.tId
   from Ticket T
   WHERE T.matchid = @matchId AND T.tStatus = 1
   )
@@ -797,7 +799,7 @@ BEGIN
   DECLARE @representativeId INT
   SET @representativeId
   = (
-    SELECT DISTINCT CR.crId
+    SELECT TOP 1 CR.crId
   FROM ClubRepresentative CR INNER JOIN Club C ON CR.clubId = C.cId
   WHERE C.cName = @clubName
   )
@@ -805,7 +807,7 @@ BEGIN
     DECLARE @stadiumManagerId INT
   SET @stadiumManagerId
   = (
-    SELECT DISTINCT SM.smId
+    SELECT TOP 1 SM.smId
   FROM StadiumManager SM INNER JOIN Stadium S ON SM.stadiumId = S.stId
   WHERE S.stName = @stadiumName
   )
@@ -838,10 +840,10 @@ BEGIN
   SELECT C1.cName, C2.cName, M.startTime, S.stName
   FROM Match M INNER JOIN Club C1 ON M.hostClubId = C1.cId
     INNER JOIN Club C2 ON M.guestClubId = C2.cId
-    INNER JOIN Stadium S ON S.stId = M.stadiumId
-  WHERE @clubName = C1.cName OR @clubName = C2.cName
+    LEFT OUTER JOIN Stadium S ON S.stId = M.stadiumId
+  WHERE  C1.cName = @clubName OR  C2.cName = @clubName
 
-  RETURN
+  RETURN 
 END
 GO
 

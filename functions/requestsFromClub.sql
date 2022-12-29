@@ -8,7 +8,7 @@ BEGIN
   DECLARE @representativeId INT
   SET @representativeId
   = (
-    SELECT DISTINCT CR.crId
+    SELECT TOP 1 CR.crId
   FROM ClubRepresentative CR INNER JOIN Club C ON CR.clubId = CR.cId
   WHERE C.cName = @clubName
   )
@@ -16,7 +16,7 @@ BEGIN
     DECLARE @stadiumManagerId INT
   SET @stadiumManagerId
   = (
-    SELECT DISTINCT SM.smId
+    SELECT TOP 1 SM.smId
   FROM StadiumManager SM INNER JOIN Stadium S ON SM.stadiumId = SM.stId
   WHERE S.stName = @stadiumName
   )

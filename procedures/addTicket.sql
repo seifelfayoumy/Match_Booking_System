@@ -9,7 +9,7 @@ BEGIN
   DECLARE @matchId INT
   SET @matchId
   = (
-    SELECT DISTINCT M.mId
+    SELECT TOP 1 M.mId
   FROM Match M INNER JOIN Club C1 on M.hostClubId = C1.cId
     INNER JOIN Club C2 on M.guestClubId = C2.cId
   WHERE C1.cName = @hostClubName AND C2.cName = @guestClubName AND M.startTime = @startTime
@@ -17,7 +17,7 @@ BEGIN
 
   DECLARE @availableCount INT
   SET @availableCount = (
-      SELECT DISTINCT M.allowedAttendees
+      SELECT TOP 1 M.allowedAttendees
   FROM Match M
   WHERE M.mId = @matchId
     )

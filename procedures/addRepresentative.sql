@@ -8,7 +8,7 @@ AS
 BEGIN
 
   DECLARE @clubId INT
-  SET @clubId = (SELECT DISTINCT C.cId
+  SET @clubId = (SELECT TOP 1 C.cId
   FROM Club C
   WHERE C.cName = @clubName)
 

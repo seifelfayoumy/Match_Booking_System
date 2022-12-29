@@ -10,7 +10,7 @@ BEGIN
   DECLARE @matchId INT
   SET @matchId
  =(
-SELECT DISTINCT m.mId
+SELECT TOP 1 m.mId
   FROM match m
     INNER JOIN Ticket T
     ON T.matchId = m.mId
@@ -23,7 +23,7 @@ SELECT DISTINCT m.mId
 
   DECLARE @ticketId int
   SET @ticketId = (
- SELECT DISTINCT T.tId
+ SELECT TOP 1 T.tId
   from Ticket T
   WHERE T.matchid = @matchId AND T.tStatus = 1
   )

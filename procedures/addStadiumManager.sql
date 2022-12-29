@@ -9,7 +9,7 @@ BEGIN
 
 
   DECLARE @stadiumId INT
-  SET @stadiumId = (SELECT DISTINCT S.stId
+  SET @stadiumId = (SELECT TOP 1 S.stId
   FROM Stadium S
   WHERE S.stName = @stadiumName)
 
