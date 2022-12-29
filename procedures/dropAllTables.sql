@@ -5,7 +5,7 @@ DROP TABLE Match
 DROP TABLE StadiumManager
 DROP TABLE SystemAdmin
 DROP TABLE AssociationManager
-DROP TABLE ClubrRpresentitive
+DROP TABLE ClubRepresentative
 DROP TABLE ClubStadiumRequest
 DROP TABLE Ticket
 DROP TABLE Fan

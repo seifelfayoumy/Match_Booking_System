@@ -5,7 +5,7 @@ DELETE FROM Match
 DELETE FROM StadiumManager
 DELETE FROM SystemAdmin
 DELETE FROM AssociationManager
-DELETE FROM ClubrRpresentitive
+DELETE FROM ClubRepresentative
 DELETE FROM ClubStadiumRequest
 DELETE FROM Ticket
 DELETE FROM Fan

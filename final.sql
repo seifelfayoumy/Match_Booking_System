@@ -37,7 +37,7 @@ BEGIN
     smId INT IDENTITY,
     smName VARCHAR(20),
     username VARCHAR(20) UNIQUE,
-    stadiumId INT,
+    stadiumId INT UNIQUE,
     PRIMARY KEY (smId),
     FOREIGN KEY (stadiumId) REFERENCES Stadium (stId),
     FOREIGN KEY (username) REFERENCES SystemUser (username)
@@ -49,7 +49,7 @@ BEGIN
     crId INT IDENTITY primary KEY,
     crName VARCHAR(20),
     username VARCHAR(20) UNIQUE,
-    clubId INT,
+    clubId INT UNIQUE,
     FOREIGN KEY (clubId) REFERENCES Club (cId),
     FOREIGN KEY (username) REFERENCES SystemUser (username)
   )
@@ -233,15 +233,24 @@ BEGIN
   WHERE S.stName = @stadiumName
   )
 
+  DECLARE @stadiumCount INT
+  SET @stadiumCount = (
+  SELECT TOP 1 S.allowedAttendees
+  FROM Stadium S 
+  WHERE S.stName = @stadiumName
+  )
+
   DECLARE @matchId INT
   SET @matchId = (
   SELECT TOP 1 M.mId
-  FROM Match M INNER JOIN Stadium S ON M.stadiumId = S.stId
-  WHERE S.stName = @stadiumName AND M.startTime = @startTime
+  FROM Match M INNER JOIN Club C ON M.hostClubId = C.cId
+  WHERE C.cName = @clubName AND M.startTime = @startTime
   )
 
   INSERT INTO ClubStadiumRequest
   VALUES(@representativeId, @stadiumManagerId, @matchId, 'unhandled')
+
+  INSERT INTO Ticket VALUES(@matchId, 1, @stadiumCount)
 
 END
 GO
@@ -504,6 +513,11 @@ DROP FUNCTION matchWithHighestAttendance
 DROP FUNCTION requestsFromClub
 DROP FUNCTION upcomingMatchesOfClub
 DROP FUNCTION viewAvailableStadiumsOn
+DROP FUNCTION allRequestsForManager
+DROP FUNCTION loginClubRep
+DROP FUNCTION loginAssocMan
+DROP FUNCTION loginStadiumMan
+DROP FUNCTION loginFan
 END
 
 END
@@ -646,6 +660,112 @@ GO
 
 -- FUNCTIONS
 
+CREATE FUNCTION loginClubRep(
+  @username VARCHAR(20),
+  @password VARCHAR(20)
+)
+RETURNS @result TABLE(
+  cRName VARCHAR(20),
+  cNAME VARCHAR(20)
+)
+AS
+BEGIN
+INSERT INTO @result
+SELECT CR.crName, C.cName
+FROM Club C INNER JOIN ClubRepresentative CR ON CR.clubId = C.cId
+INNER JOIN SystemUser SU ON  SU.username = CR.username
+WHERE CR.username = @username AND SU.suPassword = @password
+
+RETURN
+END
+GO
+
+CREATE FUNCTION loginStadiumMan(
+  @username VARCHAR(20),
+  @password VARCHAR(20)
+)
+RETURNS @result TABLE(
+  cRName VARCHAR(20),
+  cNAME VARCHAR(20)
+)
+AS
+BEGIN
+INSERT INTO @result
+SELECT SM.smName, S.stName
+FROM STADIUM S INNER JOIN StadiumManager SM ON SM.stadiumId = S.stId
+INNER JOIN SystemUser SU ON  SU.username = SM.username
+WHERE SM.username = @username AND SU.suPassword = @password
+
+RETURN
+END
+GO
+
+CREATE FUNCTION loginAssocMan(
+  @username VARCHAR(20),
+  @password VARCHAR(20)
+)
+RETURNS @result TABLE(
+  cRName VARCHAR(20)
+)
+AS
+BEGIN
+INSERT INTO @result
+SELECT AM.amName
+FROM AssociationManager AM 
+INNER JOIN SystemUser SU ON  SU.username = AM.username
+WHERE AM.username = @username AND SU.suPassword = @password
+
+RETURN
+END
+GO
+
+CREATE FUNCTION loginFan(
+  @username VARCHAR(20),
+  @password VARCHAR(20)
+)
+RETURNS @result TABLE(
+  cRName VARCHAR(20),
+  nationalId VARCHAR(20)
+)
+AS
+BEGIN
+INSERT INTO @result
+SELECT F.fName, F.nationalId
+FROM Fan F
+INNER JOIN SystemUser SU ON  SU.username = F.username
+WHERE f.username = @username AND SU.suPassword = @password
+
+RETURN
+END
+GO
+
+CREATE FUNCTION allRequestsForManager
+(@stadiumManagerUsername VARCHAR(20))
+RETURNS @result TABLE (
+  clubRepresenatativeName VARCHAR(20),
+  hostClubName VARCHAR(20),
+  gustClubName VARCHAR(20),
+  startTime DATETIME,
+  endTime DATETIME,
+  requestStatus VARCHAR(20)
+)
+
+AS
+BEGIN
+
+  INSERT INTO @result
+  SELECT CR.crname AS ClubRepresntativeName, C.cName AS HostClubName, C2.cName AS guestClubName, M.startTime, M.endTime, CSR.csrStatus
+  FROM ClubStadiumRequest CSR INNER JOIN ClubRepresentative CR ON CSR.clubRepresentativeId = CR.crId
+    INNER JOIN StadiumManager SM ON CSR.stadiumManagerId = SM.smId
+    INNER JOIN Match M ON M.mId = CSR.matchId
+    INNER JOIN Club C ON M.hostClubId = C.cId
+    INNER JOIN Club C2 ON M.guestClubId = C2.cId
+  WHERE SM.username = @stadiumManagerUsername
+
+  RETURN
+END
+GO
+
 CREATE FUNCTION allPendingRequests
 (@stadiumManagerUsername VARCHAR(20))
 RETURNS @result TABLE (
@@ -659,7 +779,7 @@ BEGIN
 
   INSERT INTO @result
   SELECT CR.crname AS ClubRepresntativeName, C.cName AS guestClubName, M.startTime
-  FROM ClubStadiumRequest CSR INNER JOIN ClubrRpresentitive CR ON CSR.clubRepresentativeId = CR.crId
+  FROM ClubStadiumRequest CSR INNER JOIN ClubRepresentative CR ON CSR.clubRepresentativeId = CR.crId
     INNER JOIN StadiumManager SM ON CSR.stadiumManagerId = SM.smId
     INNER JOIN Match M ON M.mId = CSR.matchId
     INNER JOIN Club C ON C.clubRepresentativeId = CR.crId
